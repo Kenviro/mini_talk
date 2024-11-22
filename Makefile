@@ -1,18 +1,18 @@
 NAME1 = client
 NAME2 = server
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -g3
 
 SRC_CLIENT = client.c
-SRC_SERVER = server.c
+SRC_SERVER = server.c memory.c
 
 OBJ_CLIENT = $(SRC_CLIENT:.c=.o)
 OBJ_SERVER = $(SRC_SERVER:.c=.o)
 
 HEADERS = mini_talk.h
 
-LIBFT_DIR = ./libft
-LIBFT = $(LIBFT_DIR)/libft.a
+LIBFT_DIR = ./Libft
+LIBFT = $(LIBFT_DIR)/Libft.a
 
 INCLUDES = -I $(LIBFT_DIR)
 

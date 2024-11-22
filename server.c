@@ -6,7 +6,7 @@
 /*   By: ktintim- <ktintim-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 10:49:10 by ktintim-          #+#    #+#             */
-/*   Updated: 2024/11/21 11:23:56 by ktintim-         ###   ########.fr       */
+/*   Updated: 2024/11/22 15:05:48 by ktintim-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,28 +23,23 @@ int	get_pid(void)
 	return (pid);
 }
 
-void	handle_signal(int sig)
+void	handle_signal(int sig, siginfo_t *info, void *context)
 {
-	static unsigned char	current_char;
-	static int				bit_count;
+	static sig_atomic_t		current_char = 0;
+	static sig_atomic_t		bit_count = 0;
+	static pid_t			client_pid = 0;
 
+	(void)context;
+	if (!client_pid)
+		client_pid = info->si_pid;
 	if (sig == SIGUSR1)
-	{
 		current_char <<= 1;
-	}
 	else if (sig == SIGUSR2)
-	{
 		current_char = (current_char << 1) | 1;
-	}
 	bit_count++;
 	if (bit_count == 8)
 	{
-		if (current_char == '\0')
-			write(1, "\n", 1);
-		else
-			write(1, &current_char, 1);
-		current_char = 0;
-		bit_count = 0;
+		good_malloc(current_char, client_pid);
 	}
 }
 
@@ -52,12 +47,11 @@ void	setup_signal_handlers(void)
 {
 	struct sigaction	sa;
 
-	sa.sa_handler = handle_signal;
-	sa.sa_flags = SA_RESTART;
+	sa.sa_sigaction = handle_signal;
+	sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_NODEFER;
 	sigemptyset(&sa.sa_mask);
-
-	if (sigaction(SIGUSR1, &sa, NULL) == -1 || sigaction(SIGUSR2, \
-			&sa, NULL) == -1)
+	if (sigaction(SIGUSR1, &sa, NULL) == -1 || \
+			sigaction(SIGUSR2, &sa, NULL) == -1)
 	{
 		perror("Erreur lors de la configuration des signaux");
 		exit(EXIT_FAILURE);
@@ -66,9 +60,7 @@ void	setup_signal_handlers(void)
 
 int	main(void)
 {
-	int	pid;
-
-	pid = get_pid();
+	get_pid();
 	setup_signal_handlers();
 	while (1)
 	{
