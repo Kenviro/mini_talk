@@ -31,9 +31,9 @@ $(LIBFT):
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-	rm -f $(OBJ)
+	rm -f $(OBJ_CLIENT) $(OBJ_SERVER)
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(NAME1) $(NAME2)
 
 re: fclean all

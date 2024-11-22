@@ -6,7 +6,7 @@
 /*   By: ktintim- <ktintim-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 10:55:42 by ktintim-          #+#    #+#             */
-/*   Updated: 2024/11/20 11:30:30 by ktintim-         ###   ########.fr       */
+/*   Updated: 2024/11/21 10:10:29 by ktintim-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MINI_TALK_H
 
 # include "Libft/libft.h"
+# include <signal.h>
 
 
 #endif
