@@ -6,7 +6,7 @@
 /*   By: ktintim- <ktintim-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 10:49:10 by ktintim-          #+#    #+#             */
-/*   Updated: 2024/11/22 15:05:48 by ktintim-         ###   ########.fr       */
+/*   Updated: 2024/11/25 10:46:49 by ktintim-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,9 @@ void	handle_signal(int sig, siginfo_t *info, void *context)
 	bit_count++;
 	if (bit_count == 8)
 	{
-		good_malloc(current_char, client_pid);
+		good_malloc(current_char, &client_pid);
+		current_char = 0;
+		bit_count = 0;
 	}
 }
 

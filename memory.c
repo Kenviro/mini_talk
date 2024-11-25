@@ -6,7 +6,7 @@
 /*   By: ktintim- <ktintim-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/22 14:03:50 by ktintim-          #+#    #+#             */
-/*   Updated: 2024/11/22 15:05:31 by ktintim-         ###   ########.fr       */
+/*   Updated: 2024/11/25 10:48:25 by ktintim-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,27 +36,36 @@ char	*realloc_str(char *str, char c)
 	return (temp);
 }
 
-void	good_malloc(char c, pid_t client_pid)
+char	*malloc_str(char *str)
+{
+	str = malloc(1);
+	if (!str)
+	{
+		perror("Erreur de malloc");
+		exit(EXIT_FAILURE);
+	}
+	str[0] = '\0';
+	return (str);
+}
+
+void	good_malloc(char c, pid_t *client_pid)
 {
 	static char	*str = NULL;
 
 	if (!str)
-	{
-		str = malloc(1);
-		if (!str)
-		{
-			perror("Erreur de malloc");
-			exit(EXIT_FAILURE);
-		}
-		str[0] = '\0';
-	}
+		str = malloc_str(str);
 	if (c == '\0')
 	{
 		write(1, str, ft_strlen(str));
+		write(1, "\n", 1);
 		free (str);
 		str = NULL;
-		if (client_pid)
-			kill(client_pid, SIGUSR1);
+		if (*client_pid)
+		{
+			if (kill(*client_pid, SIGUSR1) == -1)
+				perror("Erreur lors de l'envoi du signal de confirmation");
+			*client_pid = 0;
+		}
 	}
 	else
 		str = realloc_str(str, c);
