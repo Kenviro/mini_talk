@@ -6,7 +6,7 @@
 /*   By: ktintim- <ktintim-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 10:49:12 by ktintim-          #+#    #+#             */
-/*   Updated: 2024/11/22 13:56:45 by ktintim-         ###   ########.fr       */
+/*   Updated: 2024/11/25 11:21:45 by ktintim-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,16 @@ void	send_char(int pid, char c)
 	while (i >= 0)
 	{
 		if (c & (1 << i))
-			kill(pid, SIGUSR2);
+		{
+			if (kill(pid, SIGUSR2) == -1)
+				perror("Error sending SIGUSR2");
+		}
 		else
-			kill(pid, SIGUSR1);
-		usleep(150);
+		{
+			if (kill(pid, SIGUSR1) == -1)
+				perror("Error sending SIGUSR1");
+		}
+		usleep(300);
 		i--;
 	}
 }
@@ -49,11 +55,24 @@ void	send_message(int pid, const char *message)
 	send_char(pid, '\0');
 }
 
+void	setup_signal_handlers(void)
+{
+	struct sigaction	sa;
+
+	sa.sa_handler = confirmation_handler;
+	sa.sa_flags = SA_RESTART;
+	sigemptyset(&sa.sa_mask);
+	if (sigaction(SIGUSR1, &sa, NULL) == -1)
+	{
+		perror("Error setting up signal handler");
+		exit(1);
+	}
+}
+
 int	main(int argc, char **argv)
 {
 	int					pid;
 	const char			*message;
-	struct sigaction	sa;
 
 	if (argc != 3)
 	{
@@ -67,14 +86,8 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	message = argv[2];
-	sa.sa_handler = confirmation_handler;
-	sa.sa_flags = SA_RESTART;
-	sigemptyset(&sa.sa_mask);
-	if (sigaction(SIGUSR1, &sa, NULL) == -1)
-	{
-		perror("Error setting up signal handler");
-		return (1);
-	}
+	setup_signal_handlers();
+	g_message_acknowledged = 0;
 	send_message(pid, message);
 	while (!g_message_acknowledged)
 		pause();
